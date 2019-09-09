@@ -15,11 +15,19 @@ class TasksController extends Controller
      */
     public function index()
     {
-         $tasks = Task::all();
+        
+        $data = [];  
+        if (\Auth::check()) {
+         $user = \Auth::user();
+         $tasks = $user->tasks;
+         
+         $data = [
+                'user' => $user,
+                'tasks' => $tasks,
+            ];
+        }
 
-        return view('tasks.index', [
-            'tasks' => $tasks,
-        ]);
+        return view('welcome', $data);
     }
 
     /**
@@ -51,11 +59,10 @@ class TasksController extends Controller
             'content' => 'required|max:191',
         ]);
 
-        $task= new Task;
-        $task->status = $request->status;
-        $task->content = $request->content;
-        $task->save();
-
+         $request->user()->tasks()->create([
+            'content' => $request->content,
+            'status' => $request->status,
+        ]);
         return redirect('/');
     }
 
@@ -121,11 +128,12 @@ class TasksController extends Controller
      * @return \Illuminate\Http\Response
      */
     // deleteでtasks/idにアクセスされた場合の「削除処理」
-    public function destroy($id)
+     public function destroy($id)
     {
-        $task = Task::find($id);
-        $task->delete();
+        $message = Task::find($id);
+        $message->delete();
 
         return redirect('/');
     }
+
 }

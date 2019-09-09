@@ -2,7 +2,10 @@
 
 @section('content')
     @if (Auth::check())
-        @include('tasks.index')
+        @if(count($tasks) > 0)
+                    @include('tasks.index', ['tasks' => $tasks])
+        @endif
+               
     @else
         <div class="center jumbotron">
             <div class="text-center">
