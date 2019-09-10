@@ -74,12 +74,16 @@ class TasksController extends Controller
      */
       // getでtasks/idにアクセスされた場合の「取得表示処理」
     public function show($id)
-    {
+     {
         $task = Task::find($id);
 
-        return view('tasks.show', [
-            'task' => $task,
-        ]);
+        if (\Auth::id() === $task->user_id) {
+            return view('tasks.show',[
+                'task' => $task,
+                ]);
+        }
+
+        return back();
     }
 
     /**
@@ -130,10 +134,11 @@ class TasksController extends Controller
     // deleteでtasks/idにアクセスされた場合の「削除処理」
      public function destroy($id)
     {
-        $message = Task::find($id);
-        $message->delete();
+        $task = Task::find($id);
+        if (\Auth::id() === $task->user_id) {
+            $task->delete();
+        }
 
         return redirect('/');
     }
-
 }
